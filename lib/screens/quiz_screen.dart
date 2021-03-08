@@ -1,47 +1,23 @@
 import 'dart:math';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:html_character_entities/html_character_entities.dart';
+import 'package:quizz_app_using_riverpod/controllert/quizz/quizz_controller.dart';
+import 'package:quizz_app_using_riverpod/controllert/quizz/quizz_state.dart';
+import 'package:quizz_app_using_riverpod/enum/difficulty.dart';
+import 'package:quizz_app_using_riverpod/enum/quiz_status.dart';
+import 'package:quizz_app_using_riverpod/models/failure_models.dart';
+import 'package:quizz_app_using_riverpod/models/question_models.dart';
 import 'package:quizz_app_using_riverpod/repository/quizz/quizz_repository.dart';
 
-import 'controllert/quizz/quizz_controller.dart';
-import 'controllert/quizz/quizz_state.dart';
-import 'enum/difficulty.dart';
-import 'enum/quiz_status.dart';
-import 'models/failure_models.dart';
-import 'models/question_models.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp(
-        title: 'Flutter Quizz App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.yellow,
-          bottomSheetTheme:
-              const BottomSheetThemeData(backgroundColor: Colors.transparent),
-        ),
-        home: QuizScreen(),
-      ),
-    );
-  }
-}
-
 final quizQuestionsProvider = FutureProvider.autoDispose<List<Question>>(
-  (ref) => ref.watch(quizRepositoryProvider).getQuestion(
-        numQuestion: 5,
-        CategoryId: Random().nextInt(24) + 9,
-        difficulty: Difficulty.any,
-      ),
-);
+    (ref) => ref.watch(quizQuestionsProvider).getQuestions(
+          numQuestions: 5,
+          categoryId: Random().nextInt(24) + 9,
+          difficulty: Difficulty.any,
+        ));
 
 class QuizScreen extends HookWidget {
   @override
@@ -53,28 +29,29 @@ class QuizScreen extends HookWidget {
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFD4418E), Color(0xFF0652C5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+            colors: [Color(0xFFD4418E), Color(0xFF0652C5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: quizQuestions.when(
           data: (questions) => _buildBody(context, pageController, questions),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
           error: (error, _) => QuizError(
-            message: error is Failure ? error.message : 'Something went wrong!',
+            message: error is Failure ? error.message : 'Somesthing Went Wrong',
           ),
         ),
         bottomSheet: quizQuestions.maybeWhen(
           data: (questions) {
-            final quizState = useProvider(quizControllerProvider.state);
-            if (!quizState.answered) return const SizedBox.shrink();
+            final QuizState = useProvider(quizControllerProvider.state);
+            if (!QuizState.answered) return const SizedBox.shrink();
             return CustomButton(
               title: pageController.page.toInt() + 1 < questions.length
                   ? 'Next Question'
-                  : 'See Results',
+                  : 'See Result',
               onTap: () {
                 context
                     .read(quizControllerProvider)
@@ -93,23 +70,6 @@ class QuizScreen extends HookWidget {
       ),
     );
   }
-
-  Widget _buildBody(
-    BuildContext context,
-    PageController pageController,
-    List<Question> questions,
-  ) {
-    if (questions.isEmpty) return QuizError(message: 'No questions found.');
-
-    final quizState = useProvider(quizControllerProvider.state);
-    return quizState.status == QuizStatus.complete
-        ? QuizResults(state: quizState, questions: questions)
-        : QuizQuestions(
-            pageController: pageController,
-            state: quizState,
-            questions: questions,
-          );
-  }
 }
 
 class QuizError extends StatelessWidget {
@@ -119,25 +79,25 @@ class QuizError extends StatelessWidget {
     Key key,
     @required this.message,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 20.0,
             ),
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(
+            height: 20.0,
+          ),
           CustomButton(
             title: 'Retry',
             onTap: () => context.refresh(quizRepositoryProvider),
-          ),
+          )
         ],
       ),
     );
@@ -156,12 +116,8 @@ class CustomButton extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const CustomButton({
-    Key key,
-    @required this.title,
-    @required this.onTap,
-  }) : super(key: key);
-
+  const CustomButton({Key key, @required this.title, @required this.onTap})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -178,7 +134,7 @@ class CustomButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),
@@ -186,6 +142,23 @@ class CustomButton extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildBody(
+  BuildContext context,
+  PageController pageController,
+  List<Question> questions,
+) {
+  if (questions.isEmpty) return QuizError(message: 'No questions found.');
+
+  final quizState = useProvider(quizControllerProvider.state);
+  return quizState.status == QuizStatus.complete
+      ? QuizResults(state: quizState, questions: questions)
+      : QuizQuestions(
+          pageController: pageController,
+          state: quizState,
+          questions: questions,
+        );
 }
 
 class QuizResults extends StatelessWidget {

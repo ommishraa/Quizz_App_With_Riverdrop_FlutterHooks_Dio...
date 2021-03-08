@@ -8,12 +8,13 @@ class Question extends Equatable {
   final String correctAnswer;
   final List<String> answers;
 
-  const Question(
-      {@required this.category,
-      @required this.difficulty,
-      @required this.question,
-      @required this.correctAnswer,
-      @required this.answers});
+  const Question({
+    @required this.category,
+    @required this.difficulty,
+    @required this.question,
+    @required this.correctAnswer,
+    @required this.answers,
+  });
 
   @override
   List<Object> get props => [
@@ -25,13 +26,13 @@ class Question extends Equatable {
       ];
 
   factory Question.fromMap(Map<String, dynamic> map) {
-    if (map = null) return null;
+    if (map == null) return null;
     return Question(
       category: map['category'] ?? '',
       difficulty: map['difficulty'] ?? '',
       question: map['question'] ?? '',
-      correctAnswer: map['correc_answer'] ?? '',
-      answers: List<String>.from(map['incorrect_answer'] ?? [])
+      correctAnswer: map['correct_answer'] ?? '',
+      answers: List<String>.from(map['incorrect_answers'] ?? [])
         ..add(map['correct_answer'] ?? '')
         ..shuffle(),
     );

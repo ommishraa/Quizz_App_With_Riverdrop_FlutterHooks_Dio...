@@ -3,7 +3,7 @@ import 'package:quizz_app_using_riverpod/controllert/quizz/quizz_state.dart';
 import 'package:quizz_app_using_riverpod/enum/quiz_status.dart';
 import 'package:quizz_app_using_riverpod/models/question_models.dart';
 
-final QuizControllerProvider =
+final quizControllerProvider =
     StateNotifierProvider.autoDispose<QuizController>(
   (ref) => QuizController(),
 );

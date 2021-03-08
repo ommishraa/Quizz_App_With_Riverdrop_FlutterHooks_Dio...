@@ -1,6 +1,4 @@
-import 'dart:html';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +10,7 @@ import 'package:quizz_app_using_riverpod/repository/quizz/base_quizz_repository.
 
 final dioProvider = Provider<Dio>((ref) => Dio());
 
-final QuizRepositoryProvider =
+final quizRepositoryProvider =
     Provider<QuizRepository>((ref) => QuizRepository(ref.read));
 
 class QuizRepository extends BaseQuizRepository {

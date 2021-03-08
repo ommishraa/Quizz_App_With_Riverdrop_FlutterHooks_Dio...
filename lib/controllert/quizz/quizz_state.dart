@@ -39,7 +39,7 @@ class QuizState extends Equatable {
     String selectedAnswer,
     List<Question> correct,
     List<Question> incorrect,
-    QuizState status,
+    QuizStatus status,
   }) {
     return QuizState(
       selectedAnswer: selectedAnswer ?? this.selectedAnswer,
