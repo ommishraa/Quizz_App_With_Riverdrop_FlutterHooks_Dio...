@@ -16,7 +16,7 @@ import 'custom_button.dart';
 
 final quizQuestionsProvider = FutureProvider.autoDispose<List<Question>>(
   (ref) => ref.watch(quizRepositoryProvider).getQuestion(
-        numQuestion: 5,
+        numQuestion: 10,
         CategoryId: Random().nextInt(24) + 9,
         difficulty: Difficulty.any,
       ),

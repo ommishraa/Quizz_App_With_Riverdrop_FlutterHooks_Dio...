@@ -36,7 +36,7 @@ class QuizRepository extends BaseQuizRepository {
       }
 
       final response = await _read(dioProvider).get(
-        'https://opentdb.com/api.php?amount=10&type=multiple',
+        'https://opentdb.com/api.php?amount=50&type=multiple',
         queryParameters: queryParameters,
       );
 
